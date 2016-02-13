@@ -17,11 +17,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Add vagrant user to the docker group
     pkg_cmd << "usermod -a -G docker vagrant; "
     # Prepare dependencies
-    pkg_cmd << "apt-get install -q -y --force-yes redis-server rabbitmq-server git python-pip python-virtualenv;"
-    pkg_cmd << "pip install -U pip==6.0.8;"
-    pkg_cmd << "pip install -r /vagrant/util/requirements.txt; pip install --no-deps -r /vagrant/util/requirements_test.txt;"
+    pkg_cmd << "apt-get install -q -y --force-yes redis-server rabbitmq-server mysql-client git python-pip python-virtualenv libssl-dev;"
     # Setup rabbitmq
-    pkg_cmd << "rabbitmqctl add_user test test; rabbitmqctl add_vhost test; rabbitmqctl set_permissions -p test test .\\* .\\* .\\*"
+    pkg_cmd << "rabbitmqctl add_user test test; rabbitmqctl add_vhost test; rabbitmqctl set_permissions -p test test .\\* .\\* .\\*;"
+    pkg_cmd << "virtualenv occo;source occo/bin/activate;pip install --upgrade pip;"
+    pkg_cmd << "pip install --find-links http://pip.lpds.sztaki.hu/packages --no-index --trusted-host pip.lpds.sztaki.hu OCCO-API;"
+    pkg_cmd << "echo 'source occo/bin/activate' >> .bashrc"
     config.vm.provision :shell, :inline => pkg_cmd
   end
 end
